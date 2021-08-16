@@ -1,13 +1,16 @@
 package main_test
 
 import (
+	"bytes"
 	"context"
 	"github.com/go-redis/redis"
 	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"url-checker/application"
 	"url-checker/datastore"
@@ -48,11 +51,19 @@ func TestApp_Integration(t *testing.T) {
 	// creating an application object with a new Router and a Server
 	app := application.NewApp(store)
 
+	// Creating buffer to store the log outputs
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
+	defer func() {
+		log.SetOutput(os.Stderr)
+	}()
+
 	for _, tc := range []struct {
 		name     string
 		getUrl   string
 		expected string
 		expErr   string
+		cacheLog string
 	}{
 		{
 			name:     "Valid Url",
@@ -63,6 +74,7 @@ func TestApp_Integration(t *testing.T) {
 			name:     "Valid Url - Running again to fetch from cache",
 			getUrl:   "/urlinfo/1/www.compdata.ca/catalog",
 			expected: `{"RequestId":"1","Url":"http://www.compdata.ca/catalog","Risk":"High","Category":"Malware"}` + "\n",
+			cacheLog: "Returning Cached Results.",
 		},
 		{
 			name:     "Valid Url - Unknown link",
@@ -104,6 +116,10 @@ func TestApp_Integration(t *testing.T) {
 
 				if got := w.Body.String(); got != tc.expected {
 					t.Errorf("handler returned unexpected body: got %v want %v", got, tc.expected)
+				}
+
+				if tc.cacheLog != "" {
+					require.Contains(t, buf.String(), tc.cacheLog)
 				}
 			}
 		})
