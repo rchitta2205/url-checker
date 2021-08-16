@@ -1,0 +1,17 @@
+version: "3.7"
+services:
+  db:
+    container_name: db
+    image: mongo:4.4.5
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_DATABASE: urlModel
+    volumes:
+      - ./test-init-db.js:/docker-entrypoint-initdb.d/init.js
+  cache:
+    container_name: cache
+    image: redis:6.0.8
+    ports:
+      - 6379:6379
+

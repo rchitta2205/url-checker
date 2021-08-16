@@ -15,6 +15,6 @@ services:
     image: mongo:4.4.5
     container_name: db
     environment:
-      MONGO_INITDB_DATABASE: malware
+      MONGO_INITDB_DATABASE: urlModel
     volumes:
       - ./init-db.js:/docker-entrypoint-initdb.d/init.js

@@ -49,11 +49,11 @@ func (a *App) Serve() error {
 
 func (a *App) initializeRoutes() {
 	path := "/urlinfo/{request_id}/{hostname_and_port}/{original_path}"
-	a.Router.HandleFunc(path, a.GetMalware).Methods(http.MethodGet)
-	a.Router.HandleFunc(path, a.GetMalware).Queries("scheme", "{scheme}").Methods(http.MethodGet)
+	a.Router.HandleFunc(path, a.GetInfo).Methods(http.MethodGet)
+	a.Router.HandleFunc(path, a.GetInfo).Queries("scheme", "{scheme}").Methods(http.MethodGet)
 }
 
-func (a *App) GetMalware(w http.ResponseWriter, r *http.Request) {
+func (a *App) GetInfo(w http.ResponseWriter, r *http.Request) {
 	var searchUrl string
 	var scheme string
 	var response *Response
@@ -95,14 +95,14 @@ func (a *App) GetMalware(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetching the malware info for the search url
-	malware := a.DataBase.GetMalware(searchUrl)
-	if malware != nil {
+	// Fetching the UrlModel info for the search url
+	urlModel := a.DataBase.GetInfo(searchUrl)
+	if urlModel != nil {
 		response = &Response{
 			RequestId: requestId,
-			Url:       malware.Url,
-			Risk:      malware.Risk,
-			Category:  malware.Category,
+			Url:       urlModel.Url,
+			Risk:      urlModel.Risk,
+			Category:  urlModel.Category,
 		}
 	}
 

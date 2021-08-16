@@ -3,6 +3,7 @@ module url-checker
 go 1.16
 
 require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
@@ -12,7 +13,9 @@ require (
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/onsi/gomega v1.15.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
+	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.0.2 // indirect

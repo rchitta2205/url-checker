@@ -7,7 +7,7 @@ if __name__ == "__main__":
 
     outfile = "init-db.js"
     template = '''
-db.malware.insert({{
+db.urlModel.insert({{
     \"url\": \"{0}\",
     \"risk\": \"{1}\",
     \"category\": \"{2}\"

@@ -15,7 +15,7 @@ const (
 )
 
 type DB interface {
-	GetMalware(string) *datamodel.Malware
+	GetInfo(string) *datamodel.UrlModel
 }
 
 type Store struct {
@@ -29,14 +29,14 @@ type UrlMeta struct {
 }
 
 func NewMongo(dbClient *mongo.Client, cacheClient *redis.Client) DB {
-	collection := dbClient.Database("malware").Collection("malware")
+	collection := dbClient.Database("urlModel").Collection("urlModel")
 	return Store{
 		collection: collection,
 		cache:      cacheClient,
 	}
 }
 
-func (m Store) GetMalware(url string) *datamodel.Malware {
+func (m Store) GetInfo(url string) *datamodel.UrlModel {
 	var metaObj = &UrlMeta{}
 	var err error
 
@@ -44,7 +44,7 @@ func (m Store) GetMalware(url string) *datamodel.Malware {
 	err = m.getCache(url, metaObj)
 	if err == nil {
 		log.Println("Returning Cached Results.")
-		return &datamodel.Malware{
+		return &datamodel.UrlModel{
 			Url:      url,
 			Risk:     metaObj.Risk,
 			Category: metaObj.Category,
@@ -53,11 +53,11 @@ func (m Store) GetMalware(url string) *datamodel.Malware {
 
 	// Try to fetch URL from the database
 	var query = bson.D{{"url", url}}
-	var malware *datamodel.Malware
-	err = m.collection.FindOne(context.TODO(), query).Decode(&malware)
+	var urlModel *datamodel.UrlModel
+	err = m.collection.FindOne(context.TODO(), query).Decode(&urlModel)
 	if err != nil {
 		log.Println("No URL found in DB: ", err.Error())
-		malware = &datamodel.Malware{
+		urlModel = &datamodel.UrlModel{
 			Url:      url,
 			Risk:     "Unknown",
 			Category: "Unknown",
@@ -65,13 +65,13 @@ func (m Store) GetMalware(url string) *datamodel.Malware {
 	}
 
 	// Caching the results
-	metaObj.Risk = malware.Risk
-	metaObj.Category = malware.Category
-	err = m.setCache(malware.Url, metaObj)
+	metaObj.Risk = urlModel.Risk
+	metaObj.Category = urlModel.Category
+	err = m.setCache(urlModel.Url, metaObj)
 	if err != nil {
 		log.Println("Cache Write Error: ", err.Error())
 	}
-	return malware
+	return urlModel
 }
 
 func (m Store) setCache(key string, value interface{}) error {
